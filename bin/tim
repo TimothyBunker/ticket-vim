@@ -1,0 +1,45 @@
+#!/bin/sh
+set -eu
+TIM_SCRIPT=$(readlink -f -- "$0")
+TIM_INSTALL_DIR=$(CDPATH= cd -- "$(dirname -- "$TIM_SCRIPT")/.." && pwd)
+TIM_SESSION_NAME=
+TIM_BRANCH_FILTER=
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -s|--session)
+      [ "$#" -ge 2 ] && [ -n "$2" ] || { echo 'tim: -s requires a session name' >&2; exit 2; }
+      TIM_SESSION_NAME=$2; shift 2 ;;
+    --branch) TIM_BRANCH_FILTER=1; shift ;;
+    -h|--help)
+      cat <<'HELP'
+Usage: tim [-s NAME] [--branch] [--] [FILE ...]
+
+-s NAME opens or creates a session and makes it the default for this folder/repo.
+Without -s, reuse that default. If none is selected, ask for a session name.
+With no FILE, open the session; with FILE, edit it beside the session.
+--branch selects the latest session used on the current Git branch.
+Git context is always recorded automatically. No ticket is required.
+
+Inside Neovim: :ask QUESTION, :comment NOTE, :edit FILE
+Environment: TIM_NVIM (Neovim executable), TIM_PI (Pi executable), TIM_DATA_DIR
+HELP
+      exit 0 ;;
+    --) shift; break ;;
+    -*) echo "tim: unknown option: $1" >&2; exit 2 ;;
+    *) break ;;
+  esac
+done
+export TIM_INSTALL_DIR TIM_SESSION_NAME TIM_BRANCH_FILTER
+export NVIM_APPNAME=tim
+if [ -z "${TIM_NVIM:-}" ]; then
+  if command -v nvim >/dev/null 2>&1; then TIM_NVIM=nvim
+  elif [ -x "$TIM_INSTALL_DIR/.tools/neovim/bin/nvim" ]; then
+    TIM_NVIM=$TIM_INSTALL_DIR/.tools/neovim/bin/nvim
+  else TIM_NVIM=nvim
+  fi
+fi
+if ! command -v "$TIM_NVIM" >/dev/null 2>&1; then
+  echo 'tim: Neovim 0.11+ is required. Install nvim or set TIM_NVIM to its executable.' >&2
+  exit 127
+fi
+exec "$TIM_NVIM" -u "$TIM_INSTALL_DIR/config/init.lua" -- "$@"

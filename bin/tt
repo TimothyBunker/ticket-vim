@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+TT_SCRIPT=$(readlink -f -- "$0")
+TT_ROOT=$(CDPATH= cd -- "$(dirname -- "$TT_SCRIPT")/.." && pwd)
+exec node "$TT_ROOT/shell/command.mjs" "$@"

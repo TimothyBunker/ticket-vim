@@ -1,0 +1,16 @@
+*.swp
+*.swo
+__pycache__/
+doc/tags
+.tools/
+dist/
+
+.nvimlog
+
+# Local credentials and agent configuration
+.env
+.env.*
+!.env.example
+.aws/
+.agents/
+.codex/

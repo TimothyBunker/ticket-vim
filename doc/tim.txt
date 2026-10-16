@@ -1,0 +1,107 @@
+*tim.txt*  A local work session beside your source
+
+Tim requires Neovim 0.11 or newer. See README.md for installation and storage.
+
+EVERYDAY USE                                                   *tim-input*
+
+Code stays left. The agent panel has Chat, Comments, and Diffs, with one shared
+input. Switching views keeps your text. Tab/indent default to two spaces.
+
+Chat           Read and discuss work.
+Comments       Inspect findings, statuses, local notes, and linked diffs.
+Diffs          List proposals, inspect colored changes, and approve/reject them.
+Ctrl-G         Switch source/input, ready to type.
+Enter          Send the message or prepared review to Pi.
+Alt-Enter      Newline (Ctrl-J also works).
+Escape         Return from input to code; dismiss an explicit picker if open.
+F4             Hide/show the agent panel without stopping work.
+Ctrl-Q         Quit Tim with an unsaved-file check (launcher).
+
+Select code using Visual mode: its highlight persists without a popup. The input
+footer shows the target; Clear selection returns to whole-file context. Comments
+also offers Select lines for nonadjacent ranges. Every request includes the full
+current buffer, saved or unsaved, plus its selected focus. Files over 256 KB or
+prompts over 400 KB are rejected before sending. Outdated selections need reselection.
+
+REVIEW AND REQUEST STATE                                     *tim-review-task*
+
+Review beside the input prepares a review in that same input. The target is the
+selection or whole current file. Blank instructions use a default code review.
+Enter sends; Cancel review returns to chat without erasing text. Review does not
+run until submitted. Cancel stops running work; Retry explicitly resubmits a
+failed/cancelled request with current context. Neither happens automatically.
+A disconnected send can be uncertain; inspect history before retrying it.
+
+COMMENTS AND DIFFS                                           *tim-review*
+
+Structured Pi actions publish findings and proposed fixes. Comments show open,
+proposal ready, applied, resolved, or outdated. Reply attaches the finding to
+chat. Resolve preserves it but hides the source marker; Reopen reverses that.
+Refresh prepares a review of current code and requires Enter to run.
+
+A green diamond beside a source comment navigates to Diffs. Select a proposal
+there to inspect its colored preview. Apply changes buffers after validating all
+targets. Reject dismisses it without edits. Undo reverses an application only
+when it would not overwrite newer work. Refresh prepares a new request for an
+outdated proposal. Applied buffers remain unsaved. Decisions survive reopening.
+Existing text files only; unsupported patches have no Apply control.
+
+Save note in Comments explicitly saves the shared input locally against selected
+code. Enter always sends to Pi. Existing local notes and legacy prose findings
+and diffs remain available. Comments and proposals use stable IDs so follow-ups
+can update the same finding and link a fix directly.
+
+File tabs preserve unsaved buffers; + Open file opens a picker. Ctrl-PageUp and
+Ctrl-PageDown cycle files. Closing the final tab or quitting from source exits
+Tim. Click a source marker, use Points, or ]c/[c to inspect findings.
+
+COMMANDS                                                      *tim-commands*
+
+:Tim                Focus the session (a separate tab if already split).
+:TimSplit           Show the session beside the source without moving focus.
+:TimFile            Follow the current source file's conversation.
+:TimAll             Show the complete current session.
+:TimRelated         Toggle other sessions in the file view.
+:TimFiles           Pick a file.
+:TimSession [name]  Choose the default named session.
+:[range]ask [text]  Send a question; omit text to focus input.
+:[range]comment [text]
+                    Attach source to input, or save the supplied text locally.
+:[range]TimRef      Attach a source snapshot to the current draft.
+:TimDraft           Focus the input box.
+:TimSend            Submit a question to Pi.
+:TimSaveComment     Save a comment locally, without invoking Pi.
+:TimThread          Show the local thread anchored at the source cursor.
+:TimStop            Request cancellation of the current Pi turn.
+:TimImport {file}   Import historical TicketBunker/Pi JSONL read-only.
+:TimExport {file}   Export a versioned index to a new file.
+:TimTicket          Select discovered legacy ticket context to attach.
+
+Lowercase ask/comment are translated when you press Enter on the command line.
+Lua/Ex scripts can call TimAsk/TimComment directly. Questions preserve
+unsent input. Commands that explicitly save comments never invoke Pi; Enter in
+the message box always sends, including after :comment without text.
+
+REFERENCES                                                  *tim-references*
+
+@src/app.py          File reference.
+@src/app.py:42       One-based source line.
+@[path with spaces.py]:42
+                    Bracketed form compatible with TicketBunker.
+
+In drafts, CTRL-X CTRL-O completes source references. In the session buffer,
+Enter or gf opens a reference, a asks about the entry, r replies, i composes,
+and q closes the session view. CTRL-S submits a message; :write only saves
+draft text. Streaming never writes into the draft or source buffers.
+
+SESSIONS                                                      *tim-sessions*
+
+tim -s NAME creates or chooses the default session for this folder/Git worktree.
+tim FILE edits a file alongside that session; plain tim opens the session alone.
+If no default is selected, Tim asks for a name. Canceling leaves your file open.
+--branch selects by observed branch usage without changing the default and without
+changing or locking the checkout. Git context is always captured when available.
+Sessions never require a ticket. A crashed or timed-out send can be uncertain;
+inspect history before manually sending again.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
