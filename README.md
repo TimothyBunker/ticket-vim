@@ -1,5 +1,7 @@
 # tim
 
+This repository contains the Neovim version of Tim. A later Tim Desktop workspace is being developed locally with a Theia interface; that implementation is not included in this public snapshot.
+
 A small Neovim work editor with a supplementary Pi agent in view. You edit;
 the agent answers questions about selected code. Local comments, drafts, and
 named sessions work without Pi or TicketBunker.
